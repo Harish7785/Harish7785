@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'maven3'  // Replace 'maven3' with the actual name of the Maven installation configured in Jenkins
-        jdk 'jdk11'     // Replace 'jdk11' with the actual name of the JDK installation configured in Jenkins
+        jdk 'jdk17'     // Replace 'jdk17' with the actual name of the JDK installation configured in Jenkins
     }
 
     environment {
