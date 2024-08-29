@@ -1,26 +1,86 @@
-
 pipeline {
     agent any
 
+    tools {
+        maven 'maven3'  // Replace 'maven3' with the actual name of the Maven installation configured in Jenkins
+        jdk 'jdk11'     // Replace 'jdk11' with the actual name of the JDK installation configured in Jenkins
+    }
+
+    environment {
+        MAVEN_OPTS = '-Xms512m -Xmx1024m'
+    }
+
     stages {
-        stage('Maven Build') { // Correct usage of 'stage'
+        stage('Checkout') {
             steps {
-                // Your build steps here, e.g., Maven commands
-                sh 'mvn clean install'
+                // Checkout the source code from the repository
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Run Maven build command
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean install'
+                    } else {
+                        bat 'mvn clean install'
+                    }
+                }
             }
         }
 
         stage('Test') {
             steps {
-                // Your test steps here
-                sh 'mvn test'
+                // Run Maven tests
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                // Run Maven package command
+                script {
+                    if (isUnix()) {
+                        sh 'mvn package'
+                    } else {
+                        bat 'mvn package'
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Run Maven deploy command (if configured)
+                script {
+                    if (isUnix()) {
+                        sh 'mvn deploy'
+                    } else {
+                        bat 'mvn deploy'
+                    }
+                }
             }
         }
     }
 
     post {
         always {
-            echo 'This will always run after the stages are complete.'
+            echo 'This will always run, regardless of build success or failure.'
+            cleanWs() // Cleans up the workspace after the build
+        }
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed!'
         }
     }
 }
